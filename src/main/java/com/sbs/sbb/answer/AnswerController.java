@@ -1,11 +1,13 @@
 package com.sbs.sbb.answer;
 
+import com.sbs.sbb.DataNotFoundException;
 import com.sbs.sbb.question.Question;
 import com.sbs.sbb.question.QuestionService;
 import com.sbs.sbb.user.SiteUser;
 import com.sbs.sbb.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,5 +41,14 @@ public class AnswerController {
         this.answerService.create(question,answerForm.getContent(), siteUser);
 
         return String.format("redirect:/question/detail/%s",id);
+    }
+
+    public String answerModify(AnswerForm answerForm, @PathVariable("id") Integer id, Principal principal) {
+        Answer answer = this.answerService.getAnswer(id);
+        if( !answer.getAuthor().getUserName().equals(principal.getName())) {
+            throw new DataNotFoundException(HttpStatus.BAD_REQUEST,"수정권한이 없습니다.");
+        }
+        answerForm.setContent(answer.getContent());
+        return "answer_form";
     }
 }
