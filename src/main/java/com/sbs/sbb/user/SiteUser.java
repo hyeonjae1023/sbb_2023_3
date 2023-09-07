@@ -17,4 +17,5 @@ public class SiteUser {
     public String password;
     @Column(unique = true)
     public String email;
+
 }
